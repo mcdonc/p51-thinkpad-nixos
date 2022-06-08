@@ -3,9 +3,9 @@ Partition the drive and generate the NixOS configuration
 
 - Credit to https://florianfranke.dev/posts/2020/03/installing-nixos-with-encrypted-zfs-on-a-netcup.de-root-server/
 
-- sudo sgdisk --zap-all /dev/nvme0n1
+- ``sudo sgdisk --zap-all /dev/nvme0n1``
 
-- sudo fdisk /dev/nvme0n1
+- ``sudo fdisk /dev/nvme0n1``, then::
 
   g
   n
@@ -23,10 +23,12 @@ Partition the drive and generate the NixOS configuration
 
 - No swap partition (huge amount of memory, also security)
 
-- sudo mkfs.fat -F 32 /dev/nvme0n1p1
-  sudo fatlabel /dev/nvme0n1p1 NIXBOOT
+- ``sudo mkfs.fat -F 32 /dev/nvme0n1p1``
+  ``sudo fatlabel /dev/nvme0n1p1 NIXBOOT``
 
-- sudo zpool create -f \
+- Create a zpool::
+
+    sudo zpool create -f \
     -o altroot="/mnt" \
     -o ashift=12 \
     -o autotrim=on \
@@ -44,18 +46,23 @@ Partition the drive and generate the NixOS configuration
     NIXROOT \
     /dev/nvme0n1p2
 
-  zfs create -o mountpoint=legacy NIXROOT/root
-  zfs create -o mountpoint=legacy NIXROOT/home
+- Create zfs volumes::
 
-- sudo mount -t zfs NIXROOT/root /mnt
+   zfs create -o mountpoint=legacy NIXROOT/root
+   zfs create -o mountpoint=legacy NIXROOT/home
 
-- sudo mkdir /mnt/boot
-  sudo mkdir /mnt/home
-  sudo mount /dev/nvme0n1p1 /mnt/boot
-  sudo mount -t zfs NIXROOT/home /mnt/home
+- ``sudo mount -t zfs NIXROOT/root /mnt``
 
-- sudo nixos-generate-config --root /mnt
+  
+- Mount subvolumes::
+    
+   sudo mkdir /mnt/boot
+   sudo mkdir /mnt/home
+   sudo mount /dev/nvme0n1p1 /mnt/boot
+   sudo mount -t zfs NIXROOT/home /mnt/home
 
-- Edit the config (see configuration.nix here).
+- ``sudo nixos-generate-config --root /mnt``
 
-- sudo nixos-install
+- Edit the config (see ``configuration.nix`` in this repository).
+
+- ``sudo nixos-install``
