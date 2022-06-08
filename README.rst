@@ -1,5 +1,7 @@
-Partition the drive and generate the NixOS configuration
---------------------------------------------------------
+Partition the drive, generate the NixOS configuration, and install NixOS
+------------------------------------------------------------------------
+
+- For a Lenovo Thinkpad P51, see the video at ...
 
 - Credit to https://florianfranke.dev/posts/2020/03/installing-nixos-with-encrypted-zfs-on-a-netcup.de-root-server/
 
