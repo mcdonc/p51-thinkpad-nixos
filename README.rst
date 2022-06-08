@@ -1,7 +1,7 @@
-Install NixOS on a Lenovo Thinkpad P51
-======================================
+Install NixOS on a Lenovo Thinkpad P51 with a ZFS Encrypted Root
+================================================================
 
-- For a Lenovo Thinkpad P51, see the video at ...
+- Companion to the video at https://www.youtube.com/watch?v=CboOUrkIZ2k
 
 - Credit to https://florianfranke.dev/posts/2020/03/installing-nixos-with-encrypted-zfs-on-a-netcup.de-root-server/
 
