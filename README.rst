@@ -23,8 +23,10 @@ Partition the drive and generate the NixOS configuration
 
 - No swap partition (huge amount of memory, also security)
 
-- ``sudo mkfs.fat -F 32 /dev/nvme0n1p1``
-  ``sudo fatlabel /dev/nvme0n1p1 NIXBOOT``
+- Create the boot volume::
+
+   sudo mkfs.fat -F 32 /dev/nvme0n1p1
+   sudo fatlabel /dev/nvme0n1p1 NIXBOOT
 
 - Create a zpool::
 
