@@ -35,7 +35,7 @@ Steps
      ssh bouncer.repoze.org (to create .ssh dir)
      cp usbstick id_rsa* to ~/.ssh, chmod
 
-     There are ways to do this declaratively, but I'm not really ready for them yet (a bit complex).
+  There are ways to do this declaratively, but I'm not really ready for them yet (a bit complex).
 
 - Get zsh set up.
 
