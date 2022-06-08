@@ -1,10 +1,20 @@
+Low Level Utilities in NixOS on a ThinkPad P51
+==============================================
+
+- Builds on previous iteration: https://github.com/mcdonc/p51-thinkpad-nixos/tree/zfsvid
+
+- Companion to video at https://www.youtube.com/watch?v=aa5YuPclq-A
+
+Steps
+-----
+  
 - Change chrism user's password.
 
-- Set up Konsole profile (manually, for now)
+- Set up Konsole profile (manually, for now).
 
 - Get ssh outbound and inbound configured.
 
-  Inbound:
+  Inbound::
 
     users.users.${user} = {
       isNormalUser = true;
@@ -22,8 +32,7 @@
       passwordAuthentication = false;
     };
 
-
-   Outbound:
+   Outbound::
 
      ssh bouncer.repoze.org (to create .ssh dir)
      cp usbstick id_rsa* to ~/.ssh, chmod
@@ -32,55 +41,53 @@
 
 - Get zsh set up.
 
-    Under user:
+  Under user::
 
       shell = pkgs.zsh;
 
-    At config level:
+  At config level::
     
       programs.zsh.enable = true;
       programs.zsh.promptInit = "source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
 
-   Inside environment.systemPackages:
+  Inside environment.systemPackages::
 
      zsh-command-time
      zsh-powerlevel10k
 
-   Fire up a new terminal to configure.
+     *Fire up a new terminal to configure.*
 
-- Get configured with nixos-hardware.
+- Get configured with nixos-hardware::
 
-   sudo nix-channel --add https://github.com/NixOS/nixos-hardware/archive/master.tar.gz nixos-hardware
-   sudo nix-channel --update
+    sudo nix-channel --add https://github.com/NixOS/nixos-hardware/archive/master.tar.gz nixos-hardware
+    sudo nix-channel --update
 
-   Add to imports in configuration.nix:
+  Add to imports in configuration.nix::
 
    <nixos-hardware/lenovo/thinkpad>
 
-- Get tlp set up.
+- Get tlp battery charge throttling set up::
 
-  services.tlp = {
-    enable = true;
-    settings = {
-      START_CHARGE_THRESH_BAT0 = "75";
-      STOP_CHARGE_THRESH_BAT0 = "80";
+    services.tlp = {
+      settings = {
+        START_CHARGE_THRESH_BAT0 = "75";
+        STOP_CHARGE_THRESH_BAT0 = "80";
+      };
     };
-  };
 
-  # acpi_call is for tlp
-  boot.kernelModules = [ "kvm-intel" "acpi_call" ];
-  boot.extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
+    boot.kernelModules = [ "kvm-intel" "acpi_call" ];
+    boot.extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
 
-- Get SSD TRIM support going.
+- Get SSD TRIM support going::
 
     services.fstrim.enable = true;
 
-- Fix stupid Vim mouse thing.
+- Fix stupid Vim mouse thing::
 
     environment.etc."vimrc".text = ''
     " get rid of maddening mouseclick-moves-cursor behavior
     set mouse=
     set ttymouse=
-  '';
+    '';
 
 
