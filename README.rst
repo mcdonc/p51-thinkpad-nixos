@@ -1,9 +1,12 @@
-Partition the drive, generate the NixOS configuration, and install NixOS
-------------------------------------------------------------------------
+Install NixOS on a Lenovo Thinkpad P51
+======================================
 
 - For a Lenovo Thinkpad P51, see the video at ...
 
 - Credit to https://florianfranke.dev/posts/2020/03/installing-nixos-with-encrypted-zfs-on-a-netcup.de-root-server/
+
+Partition and format the drive
+------------------------------
 
 - ``sudo sgdisk --zap-all /dev/nvme0n1``
 
@@ -64,8 +67,14 @@ Partition the drive, generate the NixOS configuration, and install NixOS
    sudo mount /dev/nvme0n1p1 /mnt/boot
    sudo mount -t zfs NIXROOT/home /mnt/home
 
+Generate the configuration
+--------------------------
+
 - ``sudo nixos-generate-config --root /mnt``
 
 - Edit the config (see ``configuration.nix`` in this repository).
+
+Install NixOS
+-------------
 
 - ``sudo nixos-install``
