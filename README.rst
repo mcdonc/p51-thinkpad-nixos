@@ -26,11 +26,11 @@ Steps
      };
 
 
-    # Enable the OpenSSH daemon.
-    services.openssh = {
-      enable = true;
-      passwordAuthentication = false;
-    };
+     # Enable the OpenSSH daemon.
+     services.openssh = {
+       enable = true;
+       passwordAuthentication = false;
+     };
 
    Outbound::
 
