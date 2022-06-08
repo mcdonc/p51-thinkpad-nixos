@@ -7,19 +7,18 @@ Partition the drive and generate the NixOS configuration
 
 - ``sudo fdisk /dev/nvme0n1``, then::
 
-  g
-  n
-  accept default part num
-  accept default first sector
-  last sector: +2G
-  # yes, i used ubuntu
-  t
-  use partiton type 1 (EFI System)
-  n
-  accept default partition number
-  accept default first sector
-  accept default last sector
-  w
+    g
+    n
+    accept default part num
+    accept default first sector
+    last sector: +2G
+    t
+    use partiton type 1 (EFI System)
+    n
+    accept default partition number
+    accept default first sector
+    accept default last sector
+    w
 
 - No swap partition (huge amount of memory, also security)
 
