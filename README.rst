@@ -12,9 +12,7 @@ Steps
 
 - Set up Konsole profile (manually, for now).
 
-- Get ssh outbound and inbound configured.
-
-  Inbound::
+- Get ssh innbound configured::
 
     users.users.${user} = {
       isNormalUser = true;
@@ -32,7 +30,7 @@ Steps
        passwordAuthentication = false;
      };
 
-   Outbound::
+- Get ssh outbound configured::
 
      ssh bouncer.repoze.org (to create .ssh dir)
      cp usbstick id_rsa* to ~/.ssh, chmod
