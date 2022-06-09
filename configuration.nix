@@ -4,6 +4,9 @@
 
 { config, pkgs, ... }:
 
+let
+  user = "chrism";
+in
 {
   imports =
     [ # Include the results of the hardware scan.
@@ -11,6 +14,7 @@
       <nixos-hardware/lenovo/thinkpad>
       <nixos-hardware/common/pc/laptop/acpi_call.nix>
       <nixos-hardware/common/cpu/intel>
+      <home-manager/nixos>
     ];
 
   # Use the systemd-boot EFI boot loader.
@@ -103,7 +107,7 @@
   # services.xserver.libinput.enable = true;
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
-  users.users.chrism = {
+  users.users.${user} = {
     isNormalUser = true;
     initialPassword = "pw321";
     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
@@ -175,6 +179,30 @@
   # Before changing this value read the documentation for this option
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "22.05"; # Did you read the comment?
+
+  home-manager.users.${user} = { pkgs, ... }: {
+      xdg.configFile."environment.d/ssh_askpass.conf".text = ''
+         SSH_ASKPASS="/run/current-system/sw/bin/ksshaskpass"
+      '';
+      xdg.configFile."autostart/ssh-add.desktop".text = ''
+        [Desktop Entry]
+        Exec=ssh-add -q
+        Name=ssh-add
+        Type=Application
+      '';
+      xdg.configFile."plasma-workspace/env/ssh-agent-startup.sh" = {
+         text = ''#!/bin/sh
+           [ -n "$SSH_AGENT_PID" ] || eval "$(ssh-agent -s)"
+           '';
+         executable = true;
+      };
+      xdg.configFile."plasma-workspace/shutdown/ssh-agent-shutdown.sh" = {
+         text = ''#!/bin/sh
+           [ -z "$SSH_AGENT_PID" ] || eval "$(ssh-agent -k)"
+           '';
+         executable = true;
+      };
+    };
 
 }
 
