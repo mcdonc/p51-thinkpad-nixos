@@ -8,7 +8,9 @@
   imports =
     [ # Include the results of the hardware scan.
       ./hardware-configuration.nix
-       <nixos-hardware/lenovo/thinkpad>
+      <nixos-hardware/lenovo/thinkpad>
+      <nixos-hardware/common/pc/laptop/acpi_call.nix>
+      <nixos-hardware/common/cpu/intel>
     ];
 
   # Use the systemd-boot EFI boot loader.
@@ -65,22 +67,19 @@
   hardware = {
     nvidia = {
       prime = {
-        offload.enable = true; # enable to use intel gpu (hybrid mode)
-        # sync.enable = true; # enable to use nvidia gpu (discrete mode)
+        # offload.enable = true; # enable to use intel gpu (hybrid mode)
+        sync.enable = true; # enable to use nvidia gpu (discrete mode)
         intelBusId = "PCI:0:2:0";
         nvidiaBusId = "PCI:1:0:0";
       };
       modesetting.enable = false;
     };
 
+    # other opengl stuff is included via <nixos-hardware/common/cpu/intel> (including 
+    # intel-media-driver and vaapiIntel)
     opengl = {
       enable = true;
-      extraPackages = with pkgs; [
-        intel-media-driver # LIBVA_DRIVER_NAME=iHD
-        vaapiIntel # LIBVA_DRIVER_NAME=i965 (older but works better for FF/Chromium)
-        vaapiVdpau
-        libvdpau-va-gl
-      ];
+      extraPackages = with pkgs; [ vaapiVdpau ];
       driSupport = true;
       driSupport32Bit = true;
     };
@@ -142,15 +141,10 @@
     obs-studio
     zsh-command-time
     zsh-powerlevel10k
+    firefox
+    thermald
+    powertop
   ];
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  # };
 
 
   # Open ports in the firewall.
@@ -167,10 +161,7 @@
   };
 
   services.fstrim.enable = true;
-
-  # acpi_call is for tlp
-  boot.kernelModules = [ "kvm-intel" "acpi_call" ];
-  boot.extraModulePackages = with config.boot.kernelPackages; [ acpi_call ];
+  services.thermald.enable = true;
 
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
