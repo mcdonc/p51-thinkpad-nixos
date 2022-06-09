@@ -1,7 +1,7 @@
 NixOS 3: More Low Level Utility Configuration on Thinkpad P51
 =============================================================
 
-- Companion to video at ...
+- Companion to video at https://www.youtube.com/watch?v=-bKDD76-Vng
 
 - Builds on previous iteration https://github.com/mcdonc/p51-thinkpad-nixos/tree/secondvid
 
