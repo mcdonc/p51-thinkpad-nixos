@@ -1,7 +1,7 @@
 NixOS 4: Using Home Manager to Configure SSH Credential Caching
 ===============================================================
 
-- Companion to video at ...
+- Companion to video at https://www.youtube.com/watch?v=MjpQnvSbaIs
 
 - Builds on previous iteration https://github.com/mcdonc/p51-thinkpad-nixos/tree/thirdvid
 
