@@ -3,6 +3,11 @@ NixOS 3: More Low Level Utility Configuration on Thinkpad P51
 
 - Companion to video at ...
 
+- Builds on previous iteration https://github.com/mcdonc/p51-thinkpad-nixos/tree/secondvid
+
+Steps
+-----
+
 - Install firefox.
   
 - Change acpi_call config to use what's in nixos-hardware. See
