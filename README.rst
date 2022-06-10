@@ -1,6 +1,14 @@
 NixOS 5: Steam and Olive Editor
 ===============================
 
+- Companion to video at https://www.youtube.com/watch?v=yUbKWg-IbDI
+
+- See prior videos in playlist at
+  https://www.youtube.com/playlist?list=PLa01scHy0YEmg8trm421aYq4OtPD8u1SN 
+
+Steps
+-----
+
 - Install Steam: ``programs.steam.enable = true``
 
 - Try to install olive-editor via config.  WHen it doesn't work, ``nix-env -i
