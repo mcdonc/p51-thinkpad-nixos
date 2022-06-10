@@ -148,6 +148,7 @@ in
     firefox
     thermald
     powertop
+    olive-editor
   ];
 
 
@@ -204,5 +205,7 @@ in
       };
     };
 
+
+    programs.steam.enable = true;
 }
 
