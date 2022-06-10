@@ -62,6 +62,10 @@ in
   # Enable the Plasma 5 Desktop Environment.
   services.xserver.displayManager.sddm.enable = true;
   services.xserver.desktopManager.plasma5.enable = true;
+
+  # Configure keymap in X11
+  services.xserver.layout = "us";
+  services.xserver.xkbOptions = "ctrl:nocaps";
   
   # NVIDIA requires nonfree
   nixpkgs.config.allowUnfree = true;
@@ -71,8 +75,8 @@ in
   hardware = {
     nvidia = {
       prime = {
-        # offload.enable = true; # enable to use intel gpu (hybrid mode)
-        sync.enable = true; # enable to use nvidia gpu (discrete mode)
+        offload.enable = true; # enable to use intel gpu (hybrid mode)
+        # sync.enable = true; # enable to use nvidia gpu (discrete mode)
         intelBusId = "PCI:0:2:0";
         nvidiaBusId = "PCI:1:0:0";
       };
@@ -133,9 +137,8 @@ in
     passwordAuthentication = false;
   };
 
-  programs.zsh.enable = true;
-  programs.zsh.promptInit = "source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
-
+  #programs.zsh.enable = true;
+  #programs.zsh.promptInit = "source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -148,7 +151,7 @@ in
     firefox
     thermald
     powertop
-    olive-editor
+    libsForQt5.kdeconnect-kde
   ];
 
 
@@ -168,6 +171,10 @@ in
   services.fstrim.enable = true;
   services.thermald.enable = true;
 
+  programs.steam.enable = true;
+
+
+
   # Copy the NixOS configuration file and link it from the resulting system
   # (/run/current-system/configuration.nix). This is useful in case you
   # accidentally delete configuration.nix.
@@ -182,30 +189,91 @@ in
   system.stateVersion = "22.05"; # Did you read the comment?
 
   home-manager.users.${user} = { pkgs, ... }: {
-      xdg.configFile."environment.d/ssh_askpass.conf".text = ''
-         SSH_ASKPASS="/run/current-system/sw/bin/ksshaskpass"
-      '';
-      xdg.configFile."autostart/ssh-add.desktop".text = ''
-        [Desktop Entry]
-        Exec=ssh-add -q
-        Name=ssh-add
-        Type=Application
-      '';
-      xdg.configFile."plasma-workspace/env/ssh-agent-startup.sh" = {
-         text = ''#!/bin/sh
-           [ -n "$SSH_AGENT_PID" ] || eval "$(ssh-agent -s)"
-           '';
-         executable = true;
-      };
-      xdg.configFile."plasma-workspace/shutdown/ssh-agent-shutdown.sh" = {
-         text = ''#!/bin/sh
-           [ -z "$SSH_AGENT_PID" ] || eval "$(ssh-agent -k)"
-           '';
-         executable = true;
-      };
+
+    xdg.configFile."environment.d/ssh_askpass.conf".text = ''
+       SSH_ASKPASS="/run/current-system/sw/bin/ksshaskpass"
+    '';
+
+    xdg.configFile."autostart/ssh-add.desktop".text = ''
+      [Desktop Entry]
+      Exec=ssh-add -q
+      Name=ssh-add
+      Type=Application
+    '';
+
+    xdg.configFile."plasma-workspace/env/ssh-agent-startup.sh" = {
+      text = ''#!/bin/sh
+        [ -n "$SSH_AGENT_PID" ] || eval "$(ssh-agent -s)"
+        '';
+      executable = true;
     };
 
+    xdg.configFile."plasma-workspace/shutdown/ssh-agent-shutdown.sh" = {
+      text = ''#!/bin/sh
+        [ -z "$SSH_AGENT_PID" ] || eval "$(ssh-agent -k)"
+        '';
+        executable = true;
+    };
 
-    programs.steam.enable = true;
+    programs.emacs.enable = true;
+    services.emacs.enable = true;
+
+    programs.git = {
+      enable = true;
+      userName  = "Chris McDonough";
+      userEmail = "chrism@plope.com";
+    };
+
+    programs.zsh = {
+      enable = true;
+      enableAutosuggestions = true;
+      enableCompletion = true;
+      dotDir = ".config/zsh";
+
+      shellAliases =  {
+        nixcfgswitch = "sudo nixos-rebuild switch";
+        nixcfgedit = "sudo emacs -nw /etc/nixos/configuration.nix";
+        restartemacs = "systemctl --user restart emacs";
+        open = "kioclient exec";
+        edit = "emacsclient -n -c";
+      };
+
+      profileExtra = ''
+        setopt interactivecomments
+      '';
+
+      initExtra = ''
+        ## Keybindings section
+        bindkey -e
+        bindkey '^[[7~' beginning-of-line                               # Home key
+        bindkey '^[[H' beginning-of-line                                # Home key
+        if [[ "''${terminfo[khome]}" != "" ]]; then
+        bindkey "''${terminfo[khome]}" beginning-of-line                # [Home] - Go to beginning of line
+        fi
+        bindkey '^[[8~' end-of-line                                     # End key
+        bindkey '^[[F' end-of-line                                     # End key
+        if [[ "''${terminfo[kend]}" != "" ]]; then
+        bindkey "''${terminfo[kend]}" end-of-line                       # [End] - Go to end of line
+        fi
+        bindkey '^[[2~' overwrite-mode                                  # Insert key
+        bindkey '^[[3~' delete-char                                     # Delete key
+        bindkey '^[[C'  forward-char                                    # Right key
+        bindkey '^[[D'  backward-char                                   # Left key
+        bindkey '^[[5~' history-beginning-search-backward               # Page up key
+        bindkey '^[[6~' history-beginning-search-forward                # Page down key
+        # Navigate words with ctrl+arrow keys
+        bindkey '^[Oc' forward-word                                     #
+        bindkey '^[Od' backward-word                                    #
+        bindkey '^[[1;5D' backward-word                                 #
+        bindkey '^[[1;5C' forward-word                                  #
+        bindkey '^H' backward-kill-word                                 # delete previous word with ctrl+backspace
+        bindkey '^[[Z' undo                                             # Shift+tab undo last action
+        # Theming section
+        autoload -U colors
+        colors
+      '';
+    };
+
+  };
 }
 
