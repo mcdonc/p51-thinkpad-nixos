@@ -1,7 +1,3 @@
-# Edit this configuration file to define what should be installed on
-# your system.  Help is available in the configuration.nix(5) man page
-# and in the NixOS manual (accessible by running ‘nixos-help’).
-
 { config, pkgs, ... }:
 
 let
@@ -16,10 +12,6 @@ in
       <nixos-hardware/common/cpu/intel>
       <home-manager/nixos>
     ];
-
-  # Use the systemd-boot EFI boot loader.
-  # boot.loader.systemd-boot.enable = true;
-  # boot.loader.efi.canTouchEfiVariables = true;
 
   # Use GRUB
   boot.loader.grub.enable = true;
@@ -36,16 +28,10 @@ in
   services.zfs.autoScrub.enable = true;
 
   networking.hostName = "thinknix51"; # Define your hostname.
-  # Pick only one of the below networking options.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
   networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
 
   # Set your time zone.
   time.timeZone = "America/New_York";
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
   # Select internationalisation properties.
   # i18n.defaultLocale = "en_US.UTF-8";
@@ -91,6 +77,7 @@ in
       driSupport = true;
       driSupport32Bit = true;
     };
+    bluetooth.enable = true;
   };
 
   # Configure keymap in X11
@@ -110,22 +97,20 @@ in
   # Enable touchpad support (enabled default in most desktopManager).
   # services.xserver.libinput.enable = true;
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
+  # default shell for all users
+  users.defaultUserShell = pkgs.zsh;
+
+# Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.${user} = {
     isNormalUser = true;
     initialPassword = "pw321";
     extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
-    shell = pkgs.zsh;
     openssh = {
       authorizedKeys.keys = [ "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCnLD+dQsKPhCV3eY0lMUP4fDrECI1Boe6PbnSHY+eqRpkA/Nd5okdyXvynWETivWsKdDRlT3gIVgEHqEv8s4lzxyZx9G2fAgQVVpBLk18G9wkH0ARJcJ0+RStXLy9mwYl8Bw8J6kl1+t0FE9Aa9RNtqKzpPCNJ1Uzg2VxeNIdUXawh77kIPk/6sKyT/QTNb5ruHBcd9WYyusUcOSavC9rZpfEIFF6ZhXv2FFklAwn4ggWzYzzSLJlMHzsCGmkKmTdwKijkGFR5JQ3UVY64r3SSYw09RY1TYN/vQFqTDw8RoGZVTeJ6Er/F/4xiVBlzMvxtBxkjJA9HLd8djzSKs8yf amnesia@amnesia" ];
     };
-    packages = with pkgs; [
-      #firefox
-      #thunderbird
-    ];
   };
 
-  environment.etc."vimrc".text = ''
+ environment.etc."vimrc".text = ''
     " get rid of maddening mouseclick-moves-cursor behavior
     set mouse=
     set ttymouse=
@@ -137,28 +122,27 @@ in
     passwordAuthentication = false;
   };
 
-  #programs.zsh.enable = true;
-  #programs.zsh.promptInit = "source ${pkgs.zsh-powerlevel10k}/share/zsh-powerlevel10k/powerlevel10k.zsh-theme";
-
-  # List packages installed in system profile. To search, run:
+  # List software packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     vim_configurable # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
     wget
     obs-studio
-    zsh-command-time
-    zsh-powerlevel10k
     firefox
     thermald
     powertop
     libsForQt5.kdeconnect-kde
+    gnome.gnome-disk-utility
+    openvpn
+    unzip
+    ripgrep
+    bpytop
+    killall
+    htop
   ];
 
 
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
+  # Disable the firewall altogether.
   networking.firewall.enable = false;
 
   services.tlp = {
@@ -173,22 +157,16 @@ in
 
   programs.steam.enable = true;
 
-
-
-  # Copy the NixOS configuration file and link it from the resulting system
-  # (/run/current-system/configuration.nix). This is useful in case you
-  # accidentally delete configuration.nix.
-  # system.copySystemConfiguration = true;
-
-  # This value determines the NixOS release from which the default
-  # settings for stateful data, like file locations and database versions
-  # on your system were taken. It‘s perfectly fine and recommended to leave
-  # this value at the release version of the first install of this system.
-  # Before changing this value read the documentation for this option
-  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "22.05"; # Did you read the comment?
 
   home-manager.users.${user} = { pkgs, ... }: {
+
+    home.packages = with pkgs; [
+      keybase-gui
+      ];
+
+    services.keybase.enable = true;
+    services.kbfs.enable = true;
 
     xdg.configFile."environment.d/ssh_askpass.conf".text = ''
        SSH_ASKPASS="/run/current-system/sw/bin/ksshaskpass"
@@ -224,56 +202,68 @@ in
       userEmail = "chrism@plope.com";
     };
 
-    programs.zsh = {
-      enable = true;
-      enableAutosuggestions = true;
-      enableCompletion = true;
-      dotDir = ".config/zsh";
+     programs.zsh = {
+       enable = true;
+       enableAutosuggestions = true;
+       enableCompletion = true;
+       dotDir = ".config/zsh";
 
-      shellAliases =  {
-        nixcfgswitch = "sudo nixos-rebuild switch";
-        nixcfgedit = "sudo emacs -nw /etc/nixos/configuration.nix";
-        restartemacs = "systemctl --user restart emacs";
-        open = "kioclient exec";
-        edit = "emacsclient -n -c";
-      };
+       shellAliases =  {
+         nixcfgswitch = "sudo nixos-rebuild switch";
+         nixcfgedit = "sudo emacs -nw /etc/nixos/configuration.nix";
+         restartemacs = "systemctl --user restart emacs";
+         open = "kioclient exec";
+         edit = "emacsclient -n -c";
+ 	sgrep = "rg";
+       };
 
-      profileExtra = ''
-        setopt interactivecomments
-      '';
+       profileExtra = ''
+         setopt interactivecomments
+       '';
 
-      initExtra = ''
-        ## Keybindings section
-        bindkey -e
-        bindkey '^[[7~' beginning-of-line                               # Home key
-        bindkey '^[[H' beginning-of-line                                # Home key
-        if [[ "''${terminfo[khome]}" != "" ]]; then
-        bindkey "''${terminfo[khome]}" beginning-of-line                # [Home] - Go to beginning of line
-        fi
-        bindkey '^[[8~' end-of-line                                     # End key
-        bindkey '^[[F' end-of-line                                     # End key
-        if [[ "''${terminfo[kend]}" != "" ]]; then
-        bindkey "''${terminfo[kend]}" end-of-line                       # [End] - Go to end of line
-        fi
-        bindkey '^[[2~' overwrite-mode                                  # Insert key
-        bindkey '^[[3~' delete-char                                     # Delete key
-        bindkey '^[[C'  forward-char                                    # Right key
-        bindkey '^[[D'  backward-char                                   # Left key
-        bindkey '^[[5~' history-beginning-search-backward               # Page up key
-        bindkey '^[[6~' history-beginning-search-forward                # Page down key
-        # Navigate words with ctrl+arrow keys
-        bindkey '^[Oc' forward-word                                     #
-        bindkey '^[Od' backward-word                                    #
-        bindkey '^[[1;5D' backward-word                                 #
-        bindkey '^[[1;5C' forward-word                                  #
-        bindkey '^H' backward-kill-word                                 # delete previous word with ctrl+backspace
-        bindkey '^[[Z' undo                                             # Shift+tab undo last action
-        # Theming section
-        autoload -U colors
-        colors
-      '';
-    };
+       initExtra = ''
+         ## include config generated via "p10k configure" manually; zplug cannot edit home manager's zshrc file.
+         ## note that I moved it from its original location to /etc/nixos/p10k
+         [[ ! -f /etc/nixos/p10k/.p10k.zsh ]] || source /etc/nixos/p10k/.p10k.zsh
 
+         ## Keybindings section
+         bindkey -e
+         bindkey '^[[7~' beginning-of-line                               # Home key
+         bindkey '^[[H' beginning-of-line                                # Home key
+         if [[ "''${terminfo[khome]}" != "" ]]; then
+         bindkey "''${terminfo[khome]}" beginning-of-line                # [Home] - Go to beginning of line
+         fi
+         bindkey '^[[8~' end-of-line                                     # End key
+         bindkey '^[[F' end-of-line                                     # End key
+         if [[ "''${terminfo[kend]}" != "" ]]; then
+         bindkey "''${terminfo[kend]}" end-of-line                       # [End] - Go to end of line
+         fi
+         bindkey '^[[2~' overwrite-mode                                  # Insert key
+         bindkey '^[[3~' delete-char                                     # Delete key
+         bindkey '^[[C'  forward-char                                    # Right key
+         bindkey '^[[D'  backward-char                                   # Left key
+         bindkey '^[[5~' history-beginning-search-backward               # Page up key
+         bindkey '^[[6~' history-beginning-search-forward                # Page down key
+         # Navigate words with ctrl+arrow keys
+         bindkey '^[Oc' forward-word                                     #
+         bindkey '^[Od' backward-word                                    #
+         bindkey '^[[1;5D' backward-word                                 #
+         bindkey '^[[1;5C' forward-word                                  #
+         bindkey '^H' backward-kill-word                                 # delete previous word with ctrl+backspace
+         bindkey '^[[Z' undo                                             # Shift+tab undo last action
+         # Theming section
+         autoload -U colors
+         colors
+       '';
+       zplug = {
+         enable = true;
+         plugins = [
+           { name = "romkatv/powerlevel10k"; tags = [ as:theme depth:1 ]; }
+         # Installations with additional options. For the list of options,
+         # please refer to Zplug README.
+         ];
+       };
+     };
   };
 }
 
