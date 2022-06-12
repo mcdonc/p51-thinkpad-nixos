@@ -132,6 +132,7 @@ in
     thermald
     powertop
     libsForQt5.kdeconnect-kde
+    libsForQt5.krdc
     gnome.gnome-disk-utility
     openvpn
     unzip
@@ -139,8 +140,39 @@ in
     bpytop
     killall
     htop
+    vlc
+    google-chrome
+    audacity
+    #etcher
+    gimp
+    transmission-qt
+    remmina
+    python27
+    python27Packages.setuptools
+    python27Packages.pip
+    python37
+    python37Packages.setuptools
+    python37Packages.pip
+    python38
+    python38Packages.setuptools
+    python38Packages.pip
+    python39
+    python39Packages.setuptools
+    python39Packages.pip
+    python310Packages.tox
+    python310
+    python310Packages.setuptools
+    python310Packages.pip
+    python311
+    python311Packages.pip
+    baobab
+    signal-desktop
+    virtualbox
   ];
 
+  fonts.fonts = with pkgs; [
+    ubuntu_font_family
+  ];
 
   # Disable the firewall altogether.
   networking.firewall.enable = false;
@@ -196,13 +228,23 @@ in
     programs.emacs.enable = true;
     services.emacs.enable = true;
 
+    home.file.".emacs.d" = {
+      source = ./emacs/.emacs.d;
+      recursive = true;
+      };
+
     programs.git = {
       enable = true;
       userName  = "Chris McDonough";
       userEmail = "chrism@plope.com";
     };
 
-     programs.zsh = {
+    home.file.".p10k.zsh" = {
+      source = ./p10k/.p10k.zsh;
+      executable = true;
+      };
+
+    programs.zsh = {
        enable = true;
        enableAutosuggestions = true;
        enableCompletion = true;
@@ -222,9 +264,10 @@ in
        '';
 
        initExtra = ''
-         ## include config generated via "p10k configure" manually; zplug cannot edit home manager's zshrc file.
-         ## note that I moved it from its original location to /etc/nixos/p10k
-         [[ ! -f /etc/nixos/p10k/.p10k.zsh ]] || source /etc/nixos/p10k/.p10k.zsh
+         ## include config generated via "p10k configure" manually;
+	 ## zplug cannot edit home manager's zshrc file.
+
+         [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
 
          ## Keybindings section
          bindkey -e
@@ -259,8 +302,6 @@ in
          enable = true;
          plugins = [
            { name = "romkatv/powerlevel10k"; tags = [ as:theme depth:1 ]; }
-         # Installations with additional options. For the list of options,
-         # please refer to Zplug README.
          ];
        };
      };

@@ -1,0 +1,2 @@
+;;; Generated package description from whitespace-cleanup-mode.el  -*- no-byte-compile: t -*-
+(define-package "whitespace-cleanup-mode" "20210510.533" "Intelligently call whitespace-cleanup on save" '((emacs "24.1")) :commit "b2e35321f03914cae90be4f942d911b7e7175899" :authors '(("Steve Purcell" . "steve@sanityinc.com")) :maintainer '("Steve Purcell" . "steve@sanityinc.com") :keywords '("convenience") :url "https://github.com/purcell/whitespace-cleanup-mode")

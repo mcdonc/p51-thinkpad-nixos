@@ -1,0 +1,2 @@
+;; Generated package description from eldoc.el  -*- no-byte-compile: t -*-
+(define-package "eldoc" "1.11.1" "Show function arglist or variable docstring in echo area" '((emacs "26.3")) :commit "45978f97be89ae989ecf9e7129b88592e70a1f24" :url "https://elpa.gnu.org/packages/eldoc.html" :authors '(("Noah Friedman" . "friedman@splode.com")) :maintainer '("Noah Friedman" . "friedman@splode.com") :keywords '("extensions"))
