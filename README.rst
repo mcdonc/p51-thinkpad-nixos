@@ -25,7 +25,7 @@ Steps
       executable = true;
       };
 
-- Note that the extraInit of the zshrc laso changed to point at this
+- Note that the initExtra of the zshrc needs to be changed to point at this
   ~/.p10k.zsh file instead of the prior location.
 
 - ``nixos-rebuild switch``.
