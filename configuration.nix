@@ -2,10 +2,17 @@
 
 let
   user = "chrism";
+  nvidia-offload = pkgs.writeShellScriptBin "nvidia-offload" ''
+    export __NV_PRIME_RENDER_OFFLOAD=1
+    export __NV_PRIME_RENDER_OFFLOAD_PROVIDER=NVIDIA-G0
+    export __GLX_VENDOR_LIBRARY_NAME=nvidia
+    export __VK_LAYER_NV_optimus=NVIDIA_only
+    exec -a "$0" "$@"
+  '';
 in
 {
   imports =
-    [ # Include the results of the hardware scan.
+    [ 
       ./hardware-configuration.nix
       <nixos-hardware/lenovo/thinkpad>
       <nixos-hardware/common/pc/laptop/acpi_call.nix>
@@ -13,6 +20,13 @@ in
       <home-manager/nixos>
     ];
 
+
+  # Enable experimental features
+  nix = { 
+    package = pkgs.nixUnstable;
+    extraOptions = "experimental-features = nix-command flakes"; 
+  };
+    
   # Use GRUB
   boot.loader.grub.enable = true;
   boot.loader.grub.devices = [ "nodev" ];
@@ -28,7 +42,7 @@ in
   services.zfs.autoScrub.enable = true;
 
   networking.hostName = "thinknix51"; # Define your hostname.
-  networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
+  networking.networkmanager.enable = true;  
 
   # Set your time zone.
   time.timeZone = "America/New_York";
@@ -36,14 +50,13 @@ in
   # Select internationalisation properties.
   # i18n.defaultLocale = "en_US.UTF-8";
   # console = {
-  #   font = "Lat2-Terminus16";
-  #   keyMap = "us";
-  #   useXkbConfig = true; # use xkbOptions in tty.
-  # };
+  #  font = "Lat2-Terminus16";
+  #  keyMap = "us";
+  #  useXkbConfig = true; # use xkbOptions in tty.
+  #};
 
   # Enable the X11 windowing system.
   services.xserver.enable = true;
-
 
   # Enable the Plasma 5 Desktop Environment.
   services.xserver.displayManager.sddm.enable = true;
@@ -51,8 +64,11 @@ in
 
   # Configure keymap in X11
   services.xserver.layout = "us";
-  services.xserver.xkbOptions = "ctrl:nocaps";
-  
+  services.xserver.xkbOptions = "ctrl:nocaps,terminate:ctrl_alt_bksp";
+ 
+  # Enable the DontZap option (it is this, rather than the above that makes ctrl-alt-bs work)
+  services.xserver.enableCtrlAltBackspace = true;
+
   # NVIDIA requires nonfree
   nixpkgs.config.allowUnfree = true;
 
@@ -80,13 +96,6 @@ in
     bluetooth.enable = true;
   };
 
-  # Configure keymap in X11
-  # services.xserver.layout = "us";
-  # services.xserver.xkbOptions = {
-  #   "eurosign:e";
-  #   "caps:escape" # map caps to escape.
-  # };
-
   # Enable CUPS to print documents.
   services.printing.enable = true;
 
@@ -95,7 +104,7 @@ in
   hardware.pulseaudio.enable = true;
 
   # Enable touchpad support (enabled default in most desktopManager).
-  # services.xserver.libinput.enable = true;
+  services.xserver.libinput.enable = true;
 
   # default shell for all users
   users.defaultUserShell = pkgs.zsh;
@@ -104,7 +113,7 @@ in
   users.users.${user} = {
     isNormalUser = true;
     initialPassword = "pw321";
-    extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
+    extraGroups = [ "wheel" "networkmanager" ];
     openssh = {
       authorizedKeys.keys = [ "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCnLD+dQsKPhCV3eY0lMUP4fDrECI1Boe6PbnSHY+eqRpkA/Nd5okdyXvynWETivWsKdDRlT3gIVgEHqEv8s4lzxyZx9G2fAgQVVpBLk18G9wkH0ARJcJ0+RStXLy9mwYl8Bw8J6kl1+t0FE9Aa9RNtqKzpPCNJ1Uzg2VxeNIdUXawh77kIPk/6sKyT/QTNb5ruHBcd9WYyusUcOSavC9rZpfEIFF6ZhXv2FFklAwn4ggWzYzzSLJlMHzsCGmkKmTdwKijkGFR5JQ3UVY64r3SSYw09RY1TYN/vQFqTDw8RoGZVTeJ6Er/F/4xiVBlzMvxtBxkjJA9HLd8djzSKs8yf amnesia@amnesia" ];
     };
@@ -120,12 +129,13 @@ in
   services.openssh = {
     enable = true;
     passwordAuthentication = false;
+    permitRootLogin = "no";
   };
 
   # List software packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    vim_configurable # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
+    vim_configurable
     wget
     obs-studio
     firefox
@@ -147,27 +157,16 @@ in
     gimp
     transmission-qt
     remmina
-    python27
-    python27Packages.setuptools
-    python27Packages.pip
-    python37
-    python37Packages.setuptools
-    python37Packages.pip
-    python38
-    python38Packages.setuptools
-    python38Packages.pip
-    python39
-    python39Packages.setuptools
-    python39Packages.pip
-    python310Packages.tox
-    python310
-    python310Packages.setuptools
-    python310Packages.pip
-    python311
-    python311Packages.pip
     baobab
     signal-desktop
     virtualbox
+    python310
+    xz
+    libreoffice
+    ffmpeg-full
+    iperf
+    nvidia-offload
+    python310Packages.pyflakes
   ];
 
   fonts.fonts = with pkgs; [
@@ -200,6 +199,16 @@ in
     services.keybase.enable = true;
     services.kbfs.enable = true;
 
+    programs.ssh = {
+      enable = true;
+      matchBlocks = {
+        "lock802" = {
+          user = "pi";
+          hostname = "lock802";
+        };
+      };
+    };
+
     xdg.configFile."environment.d/ssh_askpass.conf".text = ''
        SSH_ASKPASS="/run/current-system/sw/bin/ksshaskpass"
     '';
@@ -226,6 +235,17 @@ in
     };
 
     programs.emacs.enable = true;
+    programs.emacs.extraPackages = epkgs: [
+      epkgs.nix-mode
+      epkgs.flycheck
+      epkgs.json-mode
+      epkgs.python-mode
+      epkgs.auto-complete
+      epkgs.web-mode
+      epkgs.smart-tabs-mode
+      epkgs.whitespace-cleanup-mode
+      epkgs.flycheck-pyflakes
+    ];
     services.emacs.enable = true;
 
     home.file.".emacs.d" = {
@@ -255,8 +275,12 @@ in
        };
 
       shellAliases =  {
-         nixcfgswitch = "sudo nixos-rebuild switch";
-         nixcfgedit = "sudo emacs -nw /etc/nixos/configuration.nix";
+         swnix = "sudo nixos-rebuild switch";
+         ednix = "sudo emacs -nw /etc/nixos/configuration.nix";
+         upnix = "sudo nixos-rebuild switch --upgrade";
+         schnix = "nix search nixpkgs";
+         rbnix = "sudo nixos-rebuild build --rollback";
+	 mountzfs = "sudo zfs load-key z/storage; sudo zfs mount z/storage";
          restartemacs = "systemctl --user restart emacs";
          open = "kioclient exec";
          edit = "emacsclient -n -c";
