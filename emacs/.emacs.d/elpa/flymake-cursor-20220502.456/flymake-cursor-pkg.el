@@ -1,2 +1,0 @@
-;;; Generated package description from flymake-cursor.el  -*- no-byte-compile: t -*-
-(define-package "flymake-cursor" "20220502.456" "Show flymake messages in the minibuffer after delay" '((flymake "0.3")) :commit "91025284824b3fef086709702e8a791dbaf2ef4a" :authors '(("Unknown Original Author") ("Dino Chiesa" . "dpchiesa@hotmail.com") ("Sam Graham <libflymake-emacs BLAHBLAH illusori.co.uk>")) :maintainer '("Sam Graham <libflymake-emacs BLAHBLAH illusori.co.uk>") :keywords '("languages" "mode" "flymake") :url "https://github.com/flymake/emacs-flymake-cursor")
