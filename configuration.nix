@@ -69,6 +69,9 @@ in
   # Enable the DontZap option (it is this, rather than the above that makes ctrl-alt-bs work)
   services.xserver.enableCtrlAltBackspace = true;
 
+  # Make the DPI the same in sync mode as in offload mode.                      
+  services.xserver.dpi = 96;
+
   # NVIDIA requires nonfree
   nixpkgs.config.allowUnfree = true;
 

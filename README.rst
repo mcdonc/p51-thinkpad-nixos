@@ -1,47 +1,37 @@
-NixOS 15: Let Home-Manager Manage Emacs Packages and Set Up Per-Host SSH User Config
-=====================================================================================
+NixOS 16: Synchronize Nvidia and Intel GPU DPI/Scaling in X
+===========================================================
 
-- Companion to video at https://www.youtube.com/watch?v=gZ4V_KpsLFo
+- Companion to video at ...
 
 - See the other videos in this series by visiting the playlist at
   https://www.youtube.com/playlist?list=PLa01scHy0YEmg8trm421aYq4OtPD8u1SN
 
-
-Emacs
+Steps
 -----
 
-- systemPackages: python310Packages.pyflakes
+- In offload mode, withih nix-shell -p xorg.xdpyinfo::
+  
+    xdpyinfo | grep -E 'dimensions|resolution'
 
-- home manager::
+    [nix-shell:~]$ xdpyinfo | grep -E 'dimensions|resolution'
+    dimensions:    1920x1080 pixels (508x285 millimeters)
+    resolution:    96x96 dots per inch
 
-    programs.emacs.enable = true;
-    programs.emacs.extraPackages = epkgs: [
-      epkgs.nix-mode
-      epkgs.flycheck
-      epkgs.json-mode
-      epkgs.python-mode
-      epkgs.auto-complete
-      epkgs.web-mode
-      epkgs.smart-tabs-mode
-      epkgs.whitespace-cleanup-mode
-      epkgs.flycheck-pyflakes
-    ];
+  Note that offload mode is 96dpi.
 
-- remove elpa from .emacs.d
+- In sync mode with same::
 
-SSH per-host config
--------------------
+    [nix-shell:~]$ xdpyinfo | grep -E 'dimensions|resolution'
+    dimensions:    1920x1080 pixels (652x366 millimeters)
+    resolution:    75x75 dots per inch
+    
+- To make them the same, ednix::
 
-Home manager::
+    # Make the DPI the same in sync mode as in offload mode.                      
+    services.xserver.dpi = 96;
 
-    programs.ssh = {
-      enable = true;
-      matchBlocks = {
-        "lock802" = {
-          user = "pi";
-          hostname = "lock802";
-        };
-      };
-    };
+  swnix
 
-Then, check out ~/.ssh/config
+- nvidia-settings / About
+  
+ 
