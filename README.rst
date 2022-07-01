@@ -54,8 +54,8 @@ Partition and format the drive
 
 - Create zfs volumes::
 
-   zfs create -o mountpoint=legacy NIXROOT/root
-   zfs create -o mountpoint=legacy NIXROOT/home
+   sudo zfs create -o mountpoint=legacy NIXROOT/root
+   sudo zfs create -o mountpoint=legacy NIXROOT/home
 
 - ``sudo mount -t zfs NIXROOT/root /mnt``
 
