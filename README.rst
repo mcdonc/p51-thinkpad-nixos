@@ -56,7 +56,9 @@ Partition and format the drive
 
    sudo zfs create -o mountpoint=legacy NIXROOT/root
    sudo zfs create -o mountpoint=legacy NIXROOT/home
-
+   # reserved to cope with running out of disk space
+   sudo zfs create -o refreservation=1G -o mountpoint=none NIXROOT/reserved
+   
 - ``sudo mount -t zfs NIXROOT/root /mnt``
 
   
